@@ -62,6 +62,7 @@
     {
         if (State.BreadCrumbs.Count > 0)
         {
+						State.BreadCrumbs.Pop();
             var lastCrumb = State.BreadCrumbs.Pop();
             popped = true;
             NavigationManager.NavigateTo(lastCrumb.Url);
