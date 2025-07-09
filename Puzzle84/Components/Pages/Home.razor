@@ -1,0 +1,64 @@
+﻿@page "/"
+@inject StateBag stateBag
+@inject NavigationManager navigationManager
+@implements IDisposable
+
+<PageTitle>Home</PageTitle>
+
+<h1>Blazor Puzzle #83: Breadcrumbs</h1>
+
+@if (stateBag.BreadCrumbs.Count > 0)
+{
+    <button class="btn btn-secondary mb-3" @onclick="GoBack">
+        <span class="bi bi-arrow-left-short"></span> Back
+    </button>
+}
+
+<p>
+This is a .NET 9 Blazor Web App with global server interactivity.
+</p>
+
+<p>
+In Puzzle 83, we implemented breadcrumbs as a navigation feature.
+</p>
+
+<p>
+Our initial solution showed adding some navigation elements and event handlers to every page.
+How can we wrap this into a component and abstract away that feature?
+</p>
+
+@code 
+{
+    private IDisposable? navigationHandler;
+    bool popped = false;
+
+    protected override void OnInitialized()
+    {
+        navigationHandler = navigationManager.RegisterLocationChangingHandler(OnLocationChanging);
+    }
+
+    private async ValueTask OnLocationChanging(LocationChangingContext context)
+    {
+        if (popped)
+        {
+            popped = false;
+            return;
+        }
+        stateBag.BreadCrumbs.Push("/");
+    }
+
+    private void GoBack()
+    {
+        if (stateBag.BreadCrumbs.Count > 0)
+        {
+            var url = stateBag.BreadCrumbs.Pop();
+            popped = true;
+            navigationManager.NavigateTo(url);
+        }
+    }
+
+    public void Dispose()
+    {
+        navigationHandler?.Dispose();
+    }
+}
