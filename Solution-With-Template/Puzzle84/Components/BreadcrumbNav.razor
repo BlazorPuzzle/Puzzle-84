@@ -1,0 +1,77 @@
+@inject BreadCrumbState State
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+@if (State.BreadCrumbs.Count > 1)
+{
+    <button class="btn btn-secondary mb-3" @onclick="GoBack">
+        <span class="bi bi-arrow-left-short"></span> Back
+    </button>
+}
+
+
+@code {
+
+    private bool popped = false;
+    private bool hasAddedBreadcrumb = false;
+
+    private IDisposable? navigationHandler;
+
+		[Parameter, EditorRequired]
+		public required string DisplayText { get; set; }
+
+    protected override void OnInitialized()
+    {
+        navigationHandler = NavigationManager.RegisterLocationChangingHandler(OnLocationChanging);
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !hasAddedBreadcrumb)
+        {
+            // Add breadcrumb for this page after it renders
+            var currentUrl = NavigationManager.Uri;
+            
+            // Only add if this URL is not already the top breadcrumb
+            if (State.BreadCrumbs.Count == 0 || State.BreadCrumbs.Peek().Url != currentUrl)
+            {
+                State.BreadCrumbs.Push(new BreadCrumb(DisplayText, currentUrl));
+                hasAddedBreadcrumb = true;
+                StateHasChanged();
+            }
+        }
+        
+        return Task.CompletedTask;
+    }
+
+    private ValueTask OnLocationChanging(LocationChangingContext context)
+    {
+        if (popped)
+        {
+            popped = false;
+            return ValueTask.CompletedTask;
+        }
+        
+        // Reset flag for next page
+        hasAddedBreadcrumb = false;
+        
+        return ValueTask.CompletedTask;
+    }
+
+    private void GoBack()
+    {
+        if (State.BreadCrumbs.Count > 0)
+        {
+						State.BreadCrumbs.Pop();
+            var lastCrumb = State.BreadCrumbs.Pop();
+            popped = true;
+            NavigationManager.NavigateTo(lastCrumb.Url);
+        }
+    }
+
+    public void Dispose()
+    {
+        navigationHandler?.Dispose();
+    }
+
+}
