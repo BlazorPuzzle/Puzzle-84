@@ -8,11 +8,20 @@
 	{
 		if (!isFirst)
 		{
-			<text> - </text>
+			@Separator
 		}
-		<span class="mx-1">
-			<a href="@item.Url" @onclick="() => NavigateTo(item.Url)">@item.Title</a>
-		</span>
+
+		@if (LinkTemplate == null)
+		{
+			// default link template if none provided
+			<span class="mx-1">
+				<a href="@item.Url" @onclick="() => NavigateTo(item.Url)">@item.Title</a>
+			</span>
+
+		} else
+		{
+			@LinkTemplate((item, NavigateTo))
+		}
 		isFirst = false;
 	}
 </div>
@@ -20,6 +29,15 @@
 @code {
 
 	private IDisposable? navigationHandler;
+
+	[Parameter]
+	public RenderFragment Separator { get; set; } = (builder) =>
+	{
+		builder.AddContent(0, " - ");
+	};
+
+	[Parameter]
+	public RenderFragment<(BreadCrumb item, Action<string> navigateTo)> LinkTemplate { get; set; }
 
 	protected override void OnInitialized()
 	{

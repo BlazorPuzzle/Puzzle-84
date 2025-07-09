@@ -8,7 +8,20 @@
 
     <main>
 			
-		<Breadcrumbs />
+		<Breadcrumbs>
+			<Separator>
+				<span class="mx-1">|</span>
+			</Separator>
+			<LinkTemplate Context="breadcrumb">
+        <button class="btn btn-link" @onclick="() => breadcrumb.navigateTo(breadcrumb.item.Url)">
+            <span>@if (breadcrumb.item.Title == "Home")
+            {
+                <text>🏠</text>
+            }
+            <text>@breadcrumb.item.Title</text>
+        </button>
+    	</LinkTemplate>
+		</Breadcrumbs>
 
         <article class="content px-4">
             @Body
