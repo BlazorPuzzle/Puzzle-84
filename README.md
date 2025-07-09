@@ -2,7 +2,7 @@
 
 We're reviewing the breadcrumbs from the last episode and putting them into a component.
 
-YouTube Video: https://youtu.be/
+YouTube Video: https://youtu.be/WabhfwYBdwg
 
 Blazor Puzzle Home Page: https://blazorpuzzle.com
 
